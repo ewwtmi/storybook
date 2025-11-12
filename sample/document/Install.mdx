@@ -1,0 +1,168 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Documents/導入方法" />
+
+# 導入方法
+
+
+
+## 事前準備
+
+1. Node.jsをインストールしておく
+2. プロジェクトフォルダをつくる（フォルダ名にアンダースコアは禁止）
+3. プロジェクトフォルダ内に、中身ほぼデフォルトの `package.json` を入れておく
+
+### `package.json` を入れておく理由
+Storybookインストール時に「 `package.json` ないけど大丈夫？」みたいなエラーが出る  
+name/versionの項目だけでもいいので入れておくと回避できる
+
+### `package.json` の例
+
+```json
+{
+  "name": "storybook-sample",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",    // ドキュメント階層をカスタマイズする場合、ここを追加するようにエラーが表示される
+  "devDependencies": {
+    "@storybook/addon-docs": "^10.0.6",
+    "@storybook/html-vite": "^10.0.6",
+    "storybook": "^10.0.6"
+  },
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  }
+}
+```
+
+
+
+## Storybookのインストール
+
+1. Git Bushなどでプロジェクトフォルダへ移動
+2. `npx storybook@latest init --type html` を実行
+
+> Storybook 初期化時に、 —type html を指定することで、HTML を動かすための最小限のセットアップが行えます。
+> 
+> <cite>引用元: https://dev.henry.jp/entry/storybook-for-html</cite>
+
+```
+╭───────────────────────────────────────────────────────╮
+│                                                       │
+│   Adding Storybook version 10.0.6 to your project..   │
+│                                                       │
+╰───────────────────────────────────────────────────────╯
+? New to Storybook? » - Use arrow-keys. Return to submit.
+>   Yes: Help me with onboarding
+    No: Skip onboarding & don't ask again
+```
+
+3. 案内に従ってインストール
+
+`Yes: Help me with onboarding` 選択で以下のようになる  
+※一度Noで実行すると、どのプロジェクトでもRecommended/Minimalの選択肢まで飛ぶので、**おそらくは初回のみ。**リセット方法は不明
+
+```
+Attention: Storybook now collects completely anonymous telemetry regarding usage. This information is used to shape Storybook's roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://storybook.js.org/telemetry
+
+ • Installing Storybook for user specified project type: html. ✓
+?
+We were not able to detect the right builder for your project. Please select one: » - Use arrow-keys. Return to submit.
+>   Vite
+    Webpack 5
+ • Adding Storybook support to your "HTML" app
+```
+
+`No: Skip onboarding & don't ask again` 選択で以下のようになる  
+`Recommended` だと、デフォルトのドキュメントとコンポーネントがセットで出力される  
+`Minimal` は、おそらくドキュメントなしで出力される
+
+```
+√ New to Storybook? » No: Skip onboarding & don't ask again
+Attention: Storybook now collects completely anonymous telemetry regarding usage. This information is used to shape Storybook's roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://storybook.js.org/telemetry
+
+? What configuration should we install? » - Use arrow-keys. Return to submit.
+>   Recommended: Component dev, docs, test
+    Minimal: Component dev only
+```
+
+4. インストール
+
+Storybook10からはViteかWebpack5のみになったらしい  
+Viteでやってみるとこんな感じ
+
+```
+We were not able to detect the right builder for your project. Please select one: » Vite
+
+  √ Getting the correct version of 3 packages
+
+（中略）
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   Storybook was successfully installed in your project! 🎉                   │
+│   Additional features: docs                                                  │
+│                                                                              │
+│   To run Storybook manually, run npm run storybook. CTRL+C to stop.          │
+│                                                                              │
+│   Wanna know more about Storybook? Check out https://storybook.js.org/       │
+│   Having trouble or want to chat? Join us at https://discord.gg/storybook/   │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+Running Storybook
+
+> test@1.0.0 storybook
+> storybook dev -p 6006 --quiet
+
+storybook v10.0.6
+
+(node:10124) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/git/test/.storybook/main.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\git\test\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:10124) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+```
+
+**※上記のエラーについて**  
+「このままでは `main.js` が動かないので、`package.json` に `type: module` を追加してください」みたいな内容  
+`package.json` に、事前準備の例のように設定を追加すればOK  
+下のは依存先のパッケージ内に `shell: true` 的な設定がある？ということのようだが、具体的な場所が不明  
+とりあえず現時点ではスルーでよさそう
+
+5. ライブリロードで起動
+
+自動的に `http://localhost:6006/?path=/docs/configure-your-project--docs` が開く  
+ただし新規の通常ウィンドウ（自動でシークレットウィンドウを選んでくれない）  
+`npm run storybook` で起動する／ `Ctrl + C` でストップ　って書いてある（たぶん）
+
+起動するとこんな感じ
+
+```
+$ npm run storybook
+
+> test@1.0.0 storybook
+> storybook dev -p 6006
+
+storybook v10.0.6
+
+info => Starting manager..
+info => Starting preview..
+╭──────────────────────────────────────────────────╮
+│                                                  │
+│   Storybook 10.0.6 for html-vite started         │
+│   270 ms for manager and 824 ms for preview      │
+│                                                  │
+│    Local:            http://localhost:6006/      │
+│    On your network:  http://192.168.1.4:6006/    │
+│                                                  │
+╰──────────────────────────────────────────────────╯
+```
+
+

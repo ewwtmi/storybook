@@ -1,0 +1,100 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Documents/カスタマイズ" />
+
+# カスタマイズ
+いろいろ試行錯誤したときのメモ  
+ファイル縦断で何かを探すときは、直下の `.gitignore` を一時的に除けるなどで検索すればOK
+
+
+
+## ドキュメント
+
+### ページ追加
+`プロジェクトフォルダ/stories`/ 内に、 `.mdx` の拡張子で追加。大文字・小文字は不問
+
+> MDXは、Markdownをコンポーネントとして扱うためのフォーマットです。MDXフォーマットでは、Markdown記法とJSXの両方を利用できます。
+>
+> > <cite>引用元: https://www.codegrid.net/articles/2022-mdx-1/</cite>
+
+インラインスタイルも書けるけど `!important` がないと反映されないので、やや非効率
+
+### ドキュメントのカテゴリー追加・分割
+`プロジェクトフォルダ/stories/` 内にディレクトリをつくると、そのディレクトリ名がカテゴリー名になる  
+デジタル庁の構成を参考にするとわかりやすい
+
+#### 例：「Document」カテゴリーで設定する場合
+
+1. `プロジェクトフォルダ/stories/` 内に、新規ディレクトリ `document` をつくる
+2. `プロジェクトフォルダ/.storybook/preview.js` に、下記の設定を追加
+
+```json
+/** @type { import('@storybook/html-vite').Preview } */
+const preview = {
+  parameters: {
+    // （中略）
+
+    options: {
+      storySort: {
+        order: [
+          "Documents",    // カテゴリー名称。ここが左メニューの項目名にもなる
+          ["はじめに", "導入方法", "カスタマイズ"],    // 左メニューの表示名称と、並び順を設定可能
+        ],
+      },
+    },
+
+  },
+};
+
+export default preview;
+```
+
+3. 各 `.mdx` ファイル内に、左メニューでの表示名を設定
+
+```json
+<Meta title="Documents/はじめに" />    // 日本語表記も可
+```
+
+4. Storybookを再起動して反映
+
+
+
+## コンポーネント
+デフォルトでは `プロジェクトフォルダ/stories/` 直下に入っており、左メニューでは「Example」下層になっている  
+名称は同じでも、ファイルの種類によって大文字・小文字に分かれている
+
+新規追加したときはStorybook再起動が必要  
+不要なコンポーネントは、各ファイルを削除してから再起動すれば左メニューからも消える
+
+<table>
+<thead>
+<tr>
+<th>ファイル名</th>
+<th>概要</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Xxxxxx.js</td>
+<td>対象CSSの参照、呼び出す設定とか</td>
+</tr>
+<tr>
+<td>Xxxxxx.stories.js</td>
+<td>変数の設定、変数と対象コンポーネントの紐づけ。使用パターンは後半にある `Primary: Story～` の部分</td>
+</tr>
+<tr>
+<td>xxxxxx.css</td>
+<td>反映されるスタイル。各jsファイル内からインポートされており、共通のCSSファイルパスを設定すれば連動可能。コンポーネント追加ごとに増やすのは面倒なので、後述のスニペット使うなら削除でOK</td>
+</tr>
+</tbody>
+</table>
+
+### true/falseを切り替えるトグルボタン（Controls）
+デフォルトではPrimaryが一番上で、他のトグルボタンは2番目以降に並ぶ。設定で並び替え可能  
+2番目以降のトグルボタンは `Set boolean` ボタンをクリックすると有効化され、操作可能になる  
+各コンポーネント単品ページ上でも同様で、この `Set boolean` ボタンは外すことができない
+
+参考：  
+https://storybook.js.org/docs/essentials/controls
+
+
