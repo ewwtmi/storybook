@@ -1,0 +1,61 @@
+# 基本
+# .svn
+# /local/.htaccess
+node_modules
+package-lock.json
+
+
+
+# 不要ファイル
+*.db
+*__MACOSX*
+*.DS_Store
+._*.gif*
+._*.html*
+._*.css*
+._*.jpg*
+._*.js*
+._*.pdf*
+._*.png*
+._*.xml*
+._*.htm*
+._*.php*
+._*.flv*
+._*.swf*
+._*.m4v*
+._*.wmv*
+._*.ico*
+*.ini*
+*.lock*
+*.mno*
+._*.*
+
+
+
+# 動画系
+*.flv_*
+*.swf_*
+*.m4v_*
+*.wmv_*
+*.ico_*
+*.flv
+*.wmv
+*.swf
+*.m4v
+
+
+
+# コピー系
+# Windowsの場合
+*コピー.*
+*コピー (*).*
+
+
+
+# 案件用に追加
+/_document
+
+*storybook.log
+storybook-static
+
+*.code-workspace
