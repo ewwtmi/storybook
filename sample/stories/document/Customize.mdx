@@ -1,0 +1,291 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Documents/カスタマイズ" />
+
+# カスタマイズ
+いろいろ試行錯誤したときのメモ  
+ファイル縦断で何かを探すときは、直下の `.gitignore` を一時的に除けるなどで検索すればOK
+
+
+
+## ドキュメント
+
+### ページ追加
+`プロジェクトフォルダ/stories/` 内に、 `.mdx` の拡張子で追加。大文字・小文字は不問
+
+> MDXは、Markdownをコンポーネントとして扱うためのフォーマットです。MDXフォーマットでは、Markdown記法とJSXの両方を利用できます。
+>
+> <cite>引用元: https://www.codegrid.net/articles/2022-mdx-1/</cite>
+
+インラインスタイルも書けるけど `!important` がないと反映されないので、やや非効率
+
+### ドキュメントのカテゴリー追加・分割
+デジタル庁の構成を参考にするとわかりやすい
+
+#### 例：「Document」カテゴリーで設定する場合
+
+1. `プロジェクトフォルダ/stories/` 内に、新規ディレクトリ `document` をつくる
+2. `プロジェクトフォルダ/.storybook/preview.js` に、下記の設定を追加
+
+```js
+/** @type { import('@storybook/html-vite').Preview } */
+const preview = {
+  parameters: {
+    // （中略）
+
+    options: {
+      storySort: {
+        order: [
+          "Documents",    // カテゴリー名称。ここが左メニューの項目名になる
+          ["はじめに", "導入方法", "カスタマイズ"],    // 左メニューの表示名称と、並び順を設定可能
+        ],
+      },
+    },
+
+  },
+};
+
+export default preview;
+```
+
+3. 各 `.mdx` ファイル内に、左メニューでの表示名を設定
+
+```js
+<Meta title="Documents/はじめに" />    // 日本語表記も可
+```
+
+4. Storybookを再起動して反映
+
+
+
+## コンポーネント
+デフォルトでは `プロジェクトフォルダ/stories/` 直下に入っており、左メニューでは「Example」下層になっている  
+名称は同じでも、ファイルの種類によって大文字・小文字に分かれている
+
+新規追加したときはStorybook再起動が必要  
+不要なコンポーネントは、各ファイルを削除してから再起動すれば左メニューからも消える
+
+<table>
+<thead>
+<tr>
+<th>ファイル名</th>
+<th>概要</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Xxxxxx.js</td>
+<td>対象CSSの参照、呼び出す設定とか</td>
+</tr>
+<tr>
+<td>Xxxxxx.stories.js</td>
+<td>変数の設定、変数と対象コンポーネントの紐づけ。使用パターンは後半にある `Primary: Story～` の部分</td>
+</tr>
+<tr>
+<td>xxxxxx.css</td>
+<td>反映されるスタイル。各jsファイル内からインポートされており、共通のCSSファイルパスを設定すれば連動可能。コンポーネント追加ごとに増やすのは面倒なので、後述のスニペット使うなら削除でOK</td>
+</tr>
+</tbody>
+</table>
+
+### true/falseを切り替えるトグルボタン（Controls）
+デフォルトではPrimaryが一番上で、他のトグルボタンは2番目以降に並ぶ。設定で並び替え可能  
+2番目以降のトグルボタンは `Set boolean` ボタンをクリックすると有効化され、操作可能になる  
+各コンポーネント単品ページ上でも同様で、この `Set boolean` ボタンは外すことができない
+
+参考：  
+https://storybook.js.org/docs/essentials/controls
+
+
+
+## 左メニュー
+
+### カテゴリー名の変更
+`Xxxxxx.stories.js` で変更可能  
+※デジタル庁の場合はだいぶ階層深くカスタマイズしているようで、ちょっと把握しにくかった
+
+#### 例：各コンポーネントを「Components」の下層に入れたい場合
+
+1. 各コンポーネントファイルを `プロジェクトフォルダ/stories/components/` 内に入れる
+2. 対象の `Xxxxxx.stories.js` の設定を変更
+
+```js
+// 例：Buttonの場合
+
+// （中略）
+export default {
+  title: 'Components/Button',    // ここを変更する
+  tags: ['autodocs'],
+  // （以下略）
+```
+
+3. `プロジェクトフォルダ/.storybook/preview.js` の設定を変更
+
+```js
+const preview = {
+  parameters: {
+    // （中略）
+
+    options: {
+      storySort: {
+        order: [
+          // （中略）
+          "Components",    // ここが折りたたみ部分の名称になる
+          [
+            "Heading",    // 左メニューの表示名と、並び順を設定可能
+            "Button",
+          ],
+        ],
+      },
+    },
+
+  },
+};
+```
+
+4. Storybookを再起動して反映
+
+
+
+## テンプレート
+
+> Storybookのプレビューはiframeになっていて、ストーリーで設定したコンポーネントが表示されます。
+>
+> <cite>引用元: https://qiita.com/judah/items/ee735a899bf3782d7222</cite>
+
+テンプレートファイルで `<html lang="en">` の変更ができたのでメモ  
+デジタル庁の例によると、テーマファイル内のjs経由？でも変更できるようだけど  
+個人で見つけた限りではここが手っ取り早かった  
+出力時の元になるファイルを変更するため、要バックアップ
+
+反映するためにはStorybook再起動が必要  
+faviconのファイル名は変数化されていた。Typescriptのファイル内にありそう
+
+### iframe自体
+
+```
+プロジェクトフォルダ/node_modules/storybook/assets/server/template.ejs
+```
+
+### iframe内に出力するHTML
+
+```
+プロジェクトフォルダ/node_modules/@storybook/builder-vite/input/iframe.html
+```
+
+
+
+## テーマ
+公式ドキュメント：  
+https://storybook.js.org/docs/configure/user-interface/theming
+
+参考：  
+Storybookの見た目をカスタマイズする  
+https://zenn.dev/phoenicop/articles/4c0e5d4ce59c2e  
+※内容がちょっと古い（v7）
+
+### 反映手順
+※以下はv9で試作していた当時のメモ
+
+1. カスタムテーマファイルを新規作成し、各設定を追加
+
+参考：  
+https://storybook.js.org/docs/configure/user-interface/theming#create-a-theme-quickstart
+
+`プロジェクトフォルダ/.storybook/my-theme.js` で作成する
+
+```js
+import { create } from 'storybook/theming';
+
+export default create({
+  base: 'light',    // テーマカラー（必須）。項目なしでも動作・出力自体は可能だが、構文エラー？は出る
+  brandTitle: 'Sample Storybook',
+  brandUrl: 'https://example.com',    // 左メニュー上部のロゴのリンク先
+  brandImage: 'https://storybook.js.org/images/placeholders/350x150.png',    // 左メニュー上部のロゴ画像ファイル
+  brandTarget: '_self',    // 左メニュー上部のロゴのリンクターゲット
+});
+```
+
+2. `プロジェクトフォルダ/.storybook/manager.js` を追加し、下記を設定
+
+```js
+import { addons } from 'storybook/manager-api';
+import myTheme from './my-theme';    // importが変数名、fromがファイル名
+
+addons.setConfig({
+  theme: myTheme,    // 上記で設定した変数名をここに入れる
+});
+```
+
+
+
+## CSS
+各コンポーネント用jsに毎回 `import` 書くのが面倒＆ファイル数減らしたいのと  
+ドキュメント各ページのスタイルもついでに共通化したい  
+※以下はv9で試作していた当時のメモ
+
+> Storybookは実際のサイト上での開発ではないが、CSSが同じものをベースに作らないと表示崩れを起こすので、  
+> ベースCSSを任意のものに変えることはスタイルを設定する上で非常に重要です。
+>
+> <cite>引用元: https://qiita.com/judah/items/ee735a899bf3782d7222</cite>
+
+### インライン埋め込み
+一番お手軽。ただし、この方法だとGoogleフォント等の外部ファイル設定がややこしいかも
+
+1. `プロジェクトフォルダ/.storybook/preview.js` の一行目に下記を追加
+
+```js
+import '../style.css';    // ファイルパスの起点は preview.js からのカウントでOK
+```
+
+2. Storybookを再起動  
+iframe枠・iframe内ともに下記が反映される
+
+```html
+<style type="text/css" data-vite-dev-id="/プロジェクトフォルダ/style.css">
+/* （中略） */
+</style>
+```
+
+### カスタムヘッダー経由で読み込み
+この方法を使うと、インライン埋め込みは無効化されるみたい
+
+iframe枠のカスタムヘッダーは `manager-head.html`  
+iframe内のカスタムヘッダーは `preview-head.html`  
+とりあえず両方とも設定でよいと思われる
+
+#### 反映手順
+1. 各ドキュメント `.mdx` 内を、下記タグで囲む  
+（ここではclass名を `.my-document` とした）
+
+```js
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Documents/はじめに" />
+
+<div className="my-document">    // ←これ
+  // （中略）
+</div>
+```
+
+2. `.my-document` のスタイル設定を新規CSSファイル内に書く  
+（ここでは `style.css` と `document.css` とした）
+
+3.  `manager-head.html` と `preview-head.html` に、2でつくったCSSファイルを読み込む
+
+```html
+<!-- （中略） -->
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../document.css">
+```
+
+4. ドキュメント各ページに関しては `document.css` のカスタマイズでOK。 `!important` も減らせる
+
+#### とはいえ完全には置き換えできない
+Storybook側で生成されるインラインスタイルが優先されてしまうため、反映できるのは左メニュー部分くらい  
+無理に反映しようとして動作しなくなるのは避けたいし、各コンポーネントの表示には影響ないようなので  
+現時点ではここまでとした
+
+
+
+

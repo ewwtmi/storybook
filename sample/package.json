@@ -1,0 +1,15 @@
+{
+  "name": "storybook-sample",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "devDependencies": {
+    "@storybook/addon-docs": "^10.0.6",
+    "@storybook/html-vite": "^10.0.6",
+    "storybook": "^10.0.6"
+  },
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  }
+}
