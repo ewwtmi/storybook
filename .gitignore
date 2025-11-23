@@ -1,0 +1,47 @@
+# 基本
+node_modules
+package-lock.json
+
+*.db
+*__MACOSX*
+*.DS_Store
+._*.gif*
+._*.html*
+._*.css*
+._*.jpg*
+._*.js*
+._*.pdf*
+._*.png*
+._*.xml*
+._*.htm*
+._*.php*
+._*.flv*
+._*.swf*
+._*.m4v*
+._*.wmv*
+._*.ico*
+*.ini*
+*.lock*
+*.mno*
+._*.*
+
+*.flv_*
+*.swf_*
+*.m4v_*
+*.wmv_*
+*.ico_*
+*.flv
+*.wmv
+*.swf
+*.m4v
+
+*コピー.*
+*コピー (*).*
+
+
+
+# 案件用に追加
+/_document
+*storybook.log
+storybook-static
+*.code-workspace
